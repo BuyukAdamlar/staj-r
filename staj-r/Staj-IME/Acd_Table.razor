@@ -1,0 +1,131 @@
+﻿@layout Dashboard.Dashboard
+
+<br>
+<div class="demo-inline-spacing" style="text-align:center">
+	<button type="button" class="btn rounded-pill btn-outline-info" @onclick=@(()=> selectedList = allStudents.ToList())>Tümü</button>
+	<button type="button" class="btn rounded-pill btn-outline-secondary" @onclick=@(async()=>await selectionChanged("a"))>Onay Bekleniyor</button>
+	<button type="button" class="btn rounded-pill btn-outline-danger" @onclick=@(async()=>await selectionChanged("b"))>Onaylanmadı</button>
+	<button type="button" class="btn rounded-pill btn-outline-primary" @onclick=@(async()=>await selectionChanged("c"))>Onaylandı</button>
+	<button type="button" class="btn rounded-pill btn-outline-warning" @onclick=@(async()=>await selectionChanged("d"))>Staj Yapılıyor</button>
+</div>
+<div class="demo-inline-spacing" style="text-align:center">
+	<button type="button" class="btn rounded-pill btn-outline-info" @onclick=@(async()=>await selectionChanged("e"))>Staj Sonlandı</button>
+	<button type="button" class="btn rounded-pill btn-outline-dark" @onclick=@(async()=>await selectionChanged("f"))>Değerlendirme Bekleniyor</button>
+	<button type="button" class="btn rounded-pill btn-outline-success" @onclick=@(async()=>await selectionChanged("g"))>Staj Başarılı</button>
+	<button type="button" class="btn rounded-pill btn-outline-danger" @onclick=@(async()=>await selectionChanged("h"))>Staj Başarısız</button>
+</div>
+<br>
+<br>
+<table class="table">
+	<thead>
+		<tr>
+			<th>NUMARA</th>
+			<th>İSİM</th>
+			<th>SOYİSİM</th>
+			<th>E-POSTA</th>
+			<th>FİRMA</th>
+			<th>DURUM</th>
+			<th>DETAY</th>
+		</tr>
+	</thead>
+	<tbody class="table-border-bottom-0">
+		@for (int j = 0; j < selectedList.Count; j++)
+		{
+			<tr class="table-default">
+
+				<td><strong>@selectedList[j].number</strong></td>
+				<td>
+					<ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+						<p><strong>@selectedList[j].name</strong></p>
+					</ul>
+				</td>
+				<td>
+					<ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+						<p><strong>@selectedList[j].surname</strong></p>
+					</ul>
+				</td>
+				<td>
+					<ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+						<p>@selectedList[j].email</p>
+					</ul>
+				</td>
+				<td>
+					<ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+						<p>@selectedList[j].firm</p>
+					</ul>
+				</td>
+				<td>
+					@if (selectedList[j].statusCode == "a")
+					{
+						<span class="badge bg-label-secondary me-1"><strong>@selectedList[j].status</strong></span>
+					}
+					else if (selectedList[j].statusCode == "b")
+					{
+						<span class="badge bg-label-danger me-1"><strong>@selectedList[j].status</strong></span>
+					}
+					else if (selectedList[j].statusCode == "c")
+					{
+						<span class="badge bg-label-primary me-1"><strong>@selectedList[j].status</strong></span>
+					}
+					else if (selectedList[j].statusCode == "d")
+					{
+						<span class="badge bg-label-warning me-1"><strong>@selectedList[j].status</strong></span>
+					}
+					else if (selectedList[j].statusCode == "e")
+					{
+						<span class="badge bg-label-info me-1"><strong>@selectedList[j].status</strong></span>
+					}
+					else if (selectedList[j].statusCode == "f")
+					{
+						<span class="badge bg-label-dark me-1"><strong>@selectedList[j].status</strong></span>
+					}
+					else if (selectedList[j].statusCode == "g")
+					{
+						<span class="badge bg-label-success me-1"><strong>@selectedList[j].status</strong></span>
+					}
+					else if (selectedList[j].statusCode == "h")
+					{
+						<span class="badge bg-label-danger me-1"><strong>@selectedList[j].status</strong></span>
+					}
+				</td>
+				<td>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalToggle">DETAY</button>
+				</td>
+
+				<!--Burada bitiyor-->
+			</tr>
+		}
+	</tbody>
+</table>
+@inject ILocalStorageService localStore
+@code {
+	[Parameter]
+	public UserWToken uwt { get; set; }
+	[Parameter]
+	public internships internType { get; set; }
+	protected InternPagesController ipc = new InternPagesController();
+	protected List<studentDetails> allStudents = new List<studentDetails>();
+	protected List<studentDetails> selectedList = new List<studentDetails>();
+	protected override async Task<Task> OnInitializedAsync()
+	{
+		var res = await ipc.getStudents(uwt.token, internType);
+		if (res.isSuccess)
+		{
+			allStudents = res.value;
+			selectedList = allStudents.ToList();
+		}
+		return base.OnInitializedAsync();
+	}
+	async Task selectionChanged(string _selected)
+	{
+		selectedList = new List<studentDetails>();
+		foreach (var j in allStudents)
+		{
+			if (j.statusCode == _selected)
+			{
+				selectedList.Add(j);
+			}
+		}
+	}
+
+}

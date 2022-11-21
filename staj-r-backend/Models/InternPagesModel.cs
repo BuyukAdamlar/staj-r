@@ -115,7 +115,7 @@ namespace staj_r_backend.Models
                     email = (string)neoResult["email"][j],
                     firm = (string)neoResult["firm"][j],
                     status = (string)neoResult["status"][j],
-                    statusCode = (string)neoResult["statusCode"][j],
+                    statusCode = (string)neoResult["code"][j],
                 });
             }
             return students;

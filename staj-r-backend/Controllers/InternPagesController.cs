@@ -72,7 +72,7 @@ namespace staj_r_backend.Controllers
                     value = res,
                 };
             }
-            catch
+            catch (Exception ex)
             {
                 return new Result<List<studentDetails>>(false);
             }
